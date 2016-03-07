@@ -21,7 +21,7 @@ test_requirements = [
 
 setup(
     name='mestr',
-    version='0.1.0',
+    version='0.1.1',
     description="Bring dynamic component registration to wamp crossbar router.",
     long_description=readme,
     author="Scille SAS",
