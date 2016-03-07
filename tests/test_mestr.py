@@ -10,7 +10,7 @@ Tests for `mestr` module.
 
 import unittest
 
-from mestr import mestr
+from mestr import mestr  # noqa
 
 
 class TestMestr(unittest.TestCase):
