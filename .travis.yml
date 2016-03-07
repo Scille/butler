@@ -1,0 +1,21 @@
+language: python
+python: 3.5
+env:
+- TOXENV=py35
+- TOXENV=py34
+- TOXENV=py33
+- TOXENV=py27
+- TOXENV=py26
+- TOXENV=pypy
+install: pip install -U tox
+script: tox
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: touilleMan
+  password:
+    secure: nWRa43t1cnQBkeeD6DENbZNq0HMNu1rUMXwJ3k8LJeLoyGUgSJ1FMT9quXTJUrA7W2L4rYwGvVRexfRWPsAeyGRbFg1ljFOY+GRefoJkszi8eaHnJOh/zFjBGoyvnT5KExSAA2R3Ba/OJl+ePpKsHXWJ/48YnmQ2nTviiokz94Q9KbvVxkf36GQShgsJFaNl5inoLsOneFrFYwj8g66COsTXGCBBvgcrio6nmhdyqxQlhFDAs9eoTCzWj6xULI8bpeew+Z92wyI0q7sRcYGnU59Sae6bszBF1oPxh9B4PbDwLdwIlcrUJunbv568MCUwT/eJhzQgrJl6Agf+DJe7JE9aBeSKBUY7rn4vSqmelD+ru/wPfjqV2Wf+b2nsfFsHejgRwlC3UrKPRGq6auUxjmpapcEnEsTw4RA1AoxonD1MsJNY7J2JnZf9K+G57hlpwXli/rUDgvs7FQS/9jxkDJIjSFTUOXKWp2rUdQnW+TxH+9T+XAoFpcyuAGmPALp5N+q73JsbG7etrrPlEuLl00PvVszYpezCa8QDM8JCo1IZq53D7WIpc/56JFn+5cEtYSdeJPf5XdDPKB412thHSK3Y3+ccr/d5Js30cBqQxNLqcoeOLwI5Ajup0K8puT622qhxtQujgQZ7/FXj5Mzb+Ofw7IvI1O9kUah8523vTF4=
+  on:
+    tags: true
+    repo: Scille/mestr
+    condition: $TOXENV == py27
