@@ -1,5 +1,5 @@
 from twisted.internet import defer
-from twisted.internet.defer import inlineCallbacks
+from twisted.internet.defer import inlineCallbacks, returnValue
 from autobahn.wamp.exception import ApplicationError
 from autobahn.twisted.wamp import ApplicationSession
 
@@ -25,8 +25,10 @@ def _add_to_waiting_list(application_name, version, required_components):
     global _waiting
     if application_name in _waiting:
         del _waiting[application_name]
-    _waiting[application_name] = {
-        'name': application_name, 'version': version, 'required_components': required_components, 'defer': None}
+    _waiting[application_name] = {'name': application_name,
+                                  'version': version,
+                                  'required_components': required_components,
+                                  'defer': None}
     return False
 
 
@@ -76,7 +78,8 @@ class MestrSession(ApplicationSession):
 
             if 'application_name' not in ticket and 'version' not in ticket:
                 raise ApplicationError(
-                    'could not start the authentication of an app, field application_name or version is missing')
+                    'could not start the authentication of an app,\
+                     field application_name or version is missing')
             application_name = ticket['application_name']
             version = ticket['version']
             required_components = ticket[
@@ -97,7 +100,8 @@ class MestrSession(ApplicationSession):
                     del _waiting[k]
             # backend role must be contains in the config.json
             # since we can't create them dynamically for the moment
-            return "backend"
+            returnValue("backend")
+            return
 
         return self.register(authenticate, 'mestr.authenticate')
         print("WAMP-Ticket dynamic authenticator registered!")
