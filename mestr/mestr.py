@@ -10,24 +10,29 @@ _waiting = {}
 def _start_app(application_name, version):
     global _start
     global _waiting
+    if application_name in _start and _start[application_name] == version:
+        return True
     _start[application_name] = version
-    if application_name in _waiting:
-        _waiting[application_name]['defer'].callback("result")
+
     for key in _waiting:
         if key not in _start:
-            application = _waiting[key]
-            _try_to_start_app(
-                application['name'], application['version'], application['required_components'])
+            _waiting[key]['defer'].callback("result")
     return True
 
 
 def _add_to_waiting_list(application_name, version, required_components):
     global _waiting
-    _waiting[application_name] = {'name': application_name,
-                                  'version': version,
-                                  'required_components': required_components,
-                                  'defer': None}
+    if application_name not in _waiting:
+        _waiting[application_name] = {'name': application_name,
+                                      'version': version,
+                                      'required_components': required_components,
+                                      'defer': None,
+                                      'call': False}
     return False
+
+
+def defer_try_start_app(result, application_name, version, required_components):
+    return _try_to_start_app(application_name, version, required_components)
 
 
 def _try_to_start_app(application_name, version, required_components):
@@ -44,6 +49,12 @@ def _try_to_start_app(application_name, version, required_components):
             return _start_app(application_name, version)
         else:
             return _add_to_waiting_list(application_name, version, required_components)
+
+
+def remove_element(dico, key):
+    new_dict = dico.copy()
+    del new_dict[key]
+    return new_dict
 
 
 @inlineCallbacks
@@ -75,20 +86,24 @@ def authenticate(realm, authid, details):
              field application_name or version is missing')
     application_name = ticket['application_name']
     version = ticket['version']
+
     required_components = ticket[
         'required_components'] if 'required_components' in ticket else {}
     if not _try_to_start_app(application_name, version, required_components):
         ready_defered = defer.Deferred()
-        ready_defered.addCallback(_try_to_start_app,
+        ready_defered.addCallback(defer_try_start_app,
                                   application_name=application_name,
                                   version=version,
                                   required_components=required_components)
         _waiting[application_name]['defer'] = ready_defered
         yield ready_defered
 
+    print("[MESTR] start app: ", _start)
+    print("[MESTR] waiting app: ", _waiting)
+
     for k in _start:
         if k in _waiting:
-            del _waiting[k]
+            _waiting = remove_element(_waiting, k)
     # backend role must be contains in the config.json
     # since we can't create them dynamically for the moment
     returnValue("backend")
